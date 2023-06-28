@@ -1,0 +1,15 @@
+---
+
+yaml-files:
+  - '*.yaml'
+  - '*.yml'
+  - '.yamllint'
+
+rules:
+  comments: disable
+  comments-indentation: disable
+  document-start: disable
+  new-line-at-end-of-file: enable
+  octal-values: disable
+  quoted-strings: disable
+  trailing-spaces: enable

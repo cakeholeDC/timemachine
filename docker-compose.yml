@@ -19,7 +19,7 @@ services:
       - CUSTOM_USER=false
       - DEBUG_LEVEL=1
       - MIMIC_MODEL=TimeCapsule8,119
-      # - EXTERNAL_CONF=/path/to/external/conf/file # https://github.com/mbentley/docker-timemachine#example-external_conf-file
+      # - EXTERNAL_CONF=/path/to/external/conf/file # => https://github.com/mbentley/docker-timemachine#example-external_conf-file
       - HIDE_SHARES=no
       - TM_USERNAME=timemachine
       - TM_GROUPNAME=timemachine
