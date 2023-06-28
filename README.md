@@ -1,13 +1,15 @@
-# Timemachine
-A docker-compose based samba server compatible with MacOS's TimeMachine. Quickly deployable on Raspberry Pi.
+# TimeMachine ⏳ 🤖
+A docker-compose based samba server compatible with MacOS's TimeMachine. 
+
+Quickly deployable on Raspberry Pi.
 
 ![lint](https://github.com/cakeholeDC/timemachine/actions/workflows/yaml-lint.yml/badge.svg)
 
-## Pre Reqs
+## Pre Reqs 👶 🛠
 - docker & docker-compose
 - Raspberry Pi, already setup and configured for wifi
 
-## Setup
+## Setup ⚙️ 💾
 1. Attach your external disk
 1. Identify the name of your device by running the `lsblk` command. 
     - The output will look something like the folowing:
@@ -29,11 +31,11 @@ A docker-compose based samba server compatible with MacOS's TimeMachine. Quickly
     1. `TM_DEVICE_MOUNT_POINT` - full path to the mountpoint created during setup
     1. `TM_DEVICE_SIZE_MB` - the size of the share in Megabytes (MB) (ex: 1024)
 
-## Deploy
+## Deploy 🐳 📦
 1. `docker compose up -d`
     - Run `docker-compose logs -f` to watch the container logs
 
-## Uninstall
+## Uninstall 🗑 🔥
 1. `docker-compose down -v`
 1. unnount the drive: `sudo umount /dev/sdb1 ./tm_data`
     - this will remove the docker volumes but will not touch the data on the mounted disk
