@@ -1,6 +1,8 @@
 # Timemachine
 A docker-compose based samba server compatible with MacOS's TimeMachine. Quickly deployable on Raspberry Pi.
 
+![lint](https://github.com/cakeholeDC/timemachine/actions/workflows/yaml-lint.yml/badge.svg)
+
 ## Pre Reqs
 - docker & docker-compose
 - Raspberry Pi, already setup and configured for wifi
