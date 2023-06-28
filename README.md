@@ -39,3 +39,7 @@ Quickly deployable on Raspberry Pi.
 1. `docker-compose down -v`
 1. unnount the drive: `sudo umount /dev/sdb1 ./tm_data`
     - this will remove the docker volumes but will not touch the data on the mounted disk
+
+## Testing & QA 🔎 🧪
+All testing has been done on the following hardware and software:
+- Raspberry Pi 4B 4GB; RaspberryPi OS Lite (64bit)
