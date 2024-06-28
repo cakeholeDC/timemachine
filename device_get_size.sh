@@ -8,7 +8,7 @@ if [ -z "${DEVICE}" ]; then
     exit 1;
 fi
 
-SIZE_MB=$(df | grep $DEVICE | awk -F ' ' '{print $2}')
+SIZE_MB=$(df | grep "$DEVICE" | awk -F ' ' '{print $2}')
 # echo $SIZE_MB
 
 echo "DEVICE = ${bold}$DEVICE${normal}"
