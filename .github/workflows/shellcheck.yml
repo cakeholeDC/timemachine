@@ -1,0 +1,16 @@
+name: shellcheck
+on: [push, pull_request]
+
+jobs:
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⤵️ Check out repository
+        uses: actions/checkout@v3
+
+      - name: 🦪 Run shellcheck
+        uses: sudo-bot/action-shellcheck@latest
+        with:
+            # https://github.com/koalaman/shellcheck#how-to-use
+            cli-args: "*.sh scripts/*.sh"
