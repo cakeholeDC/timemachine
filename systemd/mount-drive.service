@@ -1,0 +1,24 @@
+[Unit]
+Description=Mount external USB drive for TimeMachine
+After=local-fs.target
+Before=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Use install-systemd.sh to generate and install this unit automatically:
+#   sudo ./scripts/install-systemd.sh /dev/YOUR_DEVICE
+#
+# To install manually instead:
+#   1. Copy scripts/mount-drive.sh to /usr/local/bin/mount-drive.sh
+#   2. Replace /dev/YOUR_DEVICE below with the actual device (or use UUID):
+#        sudo blkid /dev/sda1   # copy the UUID
+#        ExecStart=/usr/local/bin/mount-drive.sh /dev/disk/by-uuid/YOUR-UUID
+#   3. Set TM_DEVICE_MOUNT_POINT to match your .env
+#   4. Copy this file to /etc/systemd/system/ then:
+#        sudo systemctl daemon-reload && sudo systemctl enable --now timemachine-mount
+Environment=TM_DEVICE_MOUNT_POINT=/tm_data
+ExecStart=/usr/local/bin/mount-drive.sh /dev/YOUR_DEVICE
+
+[Install]
+WantedBy=multi-user.target

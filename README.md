@@ -1,85 +1,99 @@
-# TimeMachine ⏳ 🤖
-A docker-compose based samba server compatible with MacOS's TimeMachine. 
+# TimeMachine
+A docker-compose based Samba server compatible with macOS Time Machine.
+Powered by [mbentley/docker-timemachine](https://github.com/mbentley/docker-timemachine).
 
 Quickly deployable on Raspberry Pi.
 
 ![yaml-lint](https://github.com/cakeholeDC/timemachine/actions/workflows/yaml-lint.yml/badge.svg)
 ![shellcheck](https://github.com/cakeholeDC/timemachine/actions/workflows/shellcheck.yml/badge.svg)
 
-## Pre Reqs 👶 🛠
-- [docker](https://docs.docker.com/desktop/install/linux-install/)
-- External Storage Device, connected to docker host (Raspberry Pi)
+## Prerequisites
+- [Docker](https://docs.docker.com/desktop/install/linux-install/)
+- External storage device connected to the Docker host (Raspberry Pi)
 
-## Setup ⚙️ 💾
-### Step 1: Attach your external disk and identify the name of your device using `lsblk`
-```shell
-    $ lsblk  
-    NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
-    sda           8:0    0   3.6T  0 disk 
-    └─sda1        8:1    0   3.6T  0 part 
-    mmcblk0     179:0    0 119.4G  0 disk 
-    ├─mmcblk0p1 179:1    0   512M  0 part /boot/firmware
-    └─mmcblk0p2 179:2    0 118.9G  0 part /
-```
-In this example, the device name is `/dev/sda1`. 
+## Setup
 
-We will refer to this as `$DEVICE` moving forward.
+### Step 1: Mount the drive
+Attach your external disk, then run:
 
 ```shell
-    $ export DEVICE=/dev/sda1
+sudo ./scripts/mount-drive.sh
 ```
-### Step 2: Create a directory to use as the mount point. 
-We'll refer to this as `$MOUNT_POINT` moving forward
+
+The script shows available devices, prompts for selection, mounts the drive, and prints the
+values you'll need for your `.env`:
+
+```
+Done.
+  Device:  /dev/sda1
+  Mount:   /tm_data
+  Marker:  /tm_data/.drive-mounted
+
+Add to your .env:
+  TM_DEVICE_MOUNT_POINT=/tm_data
+  TM_VOLUME_SIZE_LIMIT=3726 G
+
+  (TM_VOLUME_SIZE_LIMIT accepts G, T, or M — e.g. "2 T" or "500 G")
+```
+
+You can also pass the device directly to skip the prompt:
 
 ```shell
-$ export MOUNT_POINT=$PWD/tm_data
-$ mkdir $MOUNT_POINT
+sudo ./scripts/mount-drive.sh /dev/sda1
 ```
-### Step 3: Create the mountpoint, using the variables from above.
+
+### Step 2: Configure `.env`
 ```shell
-$ sudo mount $DEVICE $MOUNT_POINT
+cp .env.example .env
 ```
-To check your work, use `lsblk` again
+
+Edit `.env` with the values printed by the mount script:
+
+| Variable | Default | Description |
+|---|---|---|
+| `TM_PASSWORD` | `timemachine` | Password to connect to the Samba share |
+| `TM_SHARENAME` | `timemachine.home.arpa` | Network share name |
+| `TM_DEVICE_MOUNT_POINT` | `/tm_data` | Path where the drive is mounted |
+| `TM_VOLUME_SIZE_LIMIT` | `500 G` | Time Machine backup quota — value + unit (e.g. `2 T`, `500 G`, `1000 M`). Printed by mount script. |
+
+### Step 3: Start the stack
 ```shell
-$ lsblk
-NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
-sda           8:0    0   3.6T  0 disk 
-└─sda1        8:1    0   3.6T  0 part /path/to/mounted/tm_data
+./scripts/start.sh
 ```
-### Step 4: Prepare `.env`
-```shell
-$ cp example.env .env
-```
-Use the included convenience script to get the device size:
+
+The script verifies the drive is mounted before bringing the container up, then prints container status. To watch logs: `docker compose logs -f`
+
+## Boot persistence (optional)
+To automatically mount the drive and start the container on boot:
 
 ```shell
-$ env DEVICE=$DEVICE ./device_get_size.sh
-DEVICE = /dev/sda1
-SIZE_MB = 3906982908
-
-$ export SIZE_MB=3906982908
+sudo ./scripts/install-systemd.sh
 ```
-Edit the `.env` file
 
-| Var | default | description |
-| --- | ------- | ------------|
-| TM_PASSWORD | timemachine | password to connect to the samba share | 
-| TM_SHARENAME | timemachine | the name of the network share | 
-| TM_DEVICE_MONUT_POINT | | set this to `$MOUNT_POINT` |
-| TM_DEVICE_SIZE_MB | | the size of the share in Megabytes (MB); set this to `$SIZE_MB` | 
+The script prompts for the device (or accepts it as an argument), installs `mount-drive.sh`
+to `/usr/local/bin`, writes a systemd unit with your device and mount point baked in, then
+enables and starts the service.
 
+## Troubleshooting
 
-## Deploy 🐳 📦
-1. `docker compose up -d`
-    - Run `docker-compose logs -f` to watch the container logs
+### Container is unhealthy
+The healthcheck verifies the drive is mounted. If the drive was disconnected or remounted,
+run the mount script to restore the mount and recreate the healthcheck marker:
 
-## Uninstall 🗑 🔥
-1. `docker compose down -v`
-1. unnount the drive: `sudo umount $DEVICE $MOUNT_PONIT`
-    - this will remove the docker volumes but will not touch the data on the mounted disk
+```shell
+sudo ./scripts/mount-drive.sh
+```
 
-## Testing & QA 🔎 🧪
-All testing has been done on the following hardware and software:
-- Raspberry Pi 4B 4GB; RaspberryPi OS Lite (64bit)
-- Raspberry Pi 4B 8GB; RaspberryPi OS Lite (64bit)
-- Raspberry Pi 5 8GB; RaspberryPi OS (64bit)
+The container will return to healthy within 30 seconds — no restart needed.
+
+## Uninstall
+```shell
+sudo ./scripts/teardown.sh
+```
+
+Stops the container, removes Docker volumes (Samba state), and unmounts the drive. Your backup data on the disk is not affected.
+
+## Tested hardware
+- Raspberry Pi 4B 4GB — Raspberry Pi OS Lite (64-bit)
+- Raspberry Pi 4B 8GB — Raspberry Pi OS Lite (64-bit)
+- Raspberry Pi 5 8GB — Raspberry Pi OS (64-bit)
