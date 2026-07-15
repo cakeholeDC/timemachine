@@ -7,10 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🦪 Run shellcheck
-        uses: sudo-bot/action-shellcheck@latest
+        uses: sudo-bot/action-shellcheck@b11f3bc1a5d781d834280e52c2a845704a9276c8
         with:
             # https://github.com/koalaman/shellcheck#how-to-use
             cli-args: "scripts/*.sh"

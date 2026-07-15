@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
       - name: 🚀 Run yamllint
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y yamllint
-          yamllint ./docker-compose.yml
+        uses: ibiqlik/action-yamllint@v3.1.1
+        with:
+          file_or_dir: docker-compose.yml
